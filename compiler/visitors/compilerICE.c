@@ -68,6 +68,7 @@ void visitor_op_unary(TokenTyp operator_type) {
         }
     }
 }
+
 void visitor_op_binary(TokenTyp operator_type) {
     // TODO: bitwise operators
     switch (operator_type) {
