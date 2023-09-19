@@ -1,6 +1,7 @@
 #include "../visitor.h"
 #include "compiler.h"
 #include "../../dynabuf/dynabuf.h"
+#include "ICE.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -18,6 +19,13 @@ void compiler_init() {
     initDynamicBuf(byte, dataSegment);
 }
 
+char *compiler_get_compiled() { // TODO print the value [TMP]
+    return (char *) codeSegment->data;
+}
+unsigned int compiler_get_compiled_size() {
+    return codeIdx;
+}
+
 static void emit_byte(byte data) {
     writeDynamicBuf(byte, codeSegment, codeIdx, data); ++codeIdx;
 }
@@ -26,7 +34,16 @@ static void emit_bytes(byte data1, byte data2) {
     emit_byte(data2);
 }
 
-void visitor_literal_int(int val) {
+void emit_int(long int data) {
+    size_t size = sizeof(long int);
+
+    for (size_t i = 0; i < size; ++i) {
+        byte current_byte = (byte)((data >> (i * 8)) & 0xFF);
+        emit_byte(current_byte);
+    }
+}
+
+void visitor_literal_int(long int val) {
     // This value is NOT loaded into the data segment for faster access times.
     // In the case of string/list/obj literals, they are loaded into the data segment.
 
@@ -34,7 +51,8 @@ void visitor_literal_int(int val) {
     //               ; Initial,        stack = [ ]
     // const.i <n>   ; Constnant load, stack = [n]
 
-    // TODO: implement ICE bytecode once the instruction set is final
+    emit_byte(ICE_CONST_I);
+    emit_int(val);
 }
 void visitor_op_unary(TokenTyp operator_type) {
     switch (operator_type) {
@@ -43,24 +61,26 @@ void visitor_op_unary(TokenTyp operator_type) {
 
             // ICE assembly for negating a value on the stack:
             //             ; Initial,         stack = [n  ]
-            // const.i 0   ; Load a constant, stack = [n 0]
+            // const.0     ; Load a constant, stack = [n 0]
             // swap        ; Swap 2 vals,     stack = [0 n]
             // sub.i       ; Subtract,        stack = [0-n]
 
             // This is equivalent to 0 - n, or just -n
 
-            // TODO: implement ICE bytecode once the instruction set is final
+            emit_byte(ICE_CONST_0);
+            emit_byte(ICE_SWAP);
+            emit_byte(ICE_SUB_I);
         } break;
         case TOKEN_BANG: {
             // TODO: type checking
 
             // ICE assembly for a bitwise NOT:
             //              ; Initial,     stack = [n ]
-            // not.q        ; Bitwise NOT, stack = [!n]
+            // not          ; Bitwise NOT, stack = [!n]
 
             // This is !n
 
-            // TODO: implement ICE bytecode once the instruction set is final
+            emit_byte(ICE_NOT);
         } break;
         default: {
             fprintf(stderr, "Compile error: Unknown unary operator\n");
@@ -81,7 +101,7 @@ void visitor_op_binary(TokenTyp operator_type) {
 
             // This is n+m
 
-            // TODO: implement ICE bytecode once the instruction set is final
+            emit_byte(ICE_ADD_I);
         } break;
         case TOKEN_MINUS: {
             // TODO: type checking
@@ -92,7 +112,7 @@ void visitor_op_binary(TokenTyp operator_type) {
 
             // This is n-m
 
-            // TODO: implement ICE bytecode once the instruction set is final
+            emit_byte(ICE_SUB_I);
         } break;
         case TOKEN_ASTERIX: {
             // TODO: type checking
@@ -103,7 +123,7 @@ void visitor_op_binary(TokenTyp operator_type) {
 
             // This is n*m
 
-            // TODO: implement ICE bytecode once the instruction set is final
+            emit_byte(ICE_MUL_I);
         } break;
         case TOKEN_SLASH: {
             // TODO: type checking
@@ -114,7 +134,7 @@ void visitor_op_binary(TokenTyp operator_type) {
 
             // This is n/m
 
-            // TODO: implement ICE bytecode once the instruction set is final
+            emit_byte(ICE_DIV_I);
         } break;
         default: {
             fprintf(stderr, "Compile error: unknown binary operator\n");

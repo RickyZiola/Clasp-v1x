@@ -57,7 +57,7 @@ void number() {
     memcpy(str, num.str, num.length);
     str[num.length] = '\0';
     if (strchr(str, '.') !=  NULL) parse_err(num, "Floating-points are not yet supported");
-    int value = (int)strtol(str, NULL, 10);
+    long int value = (long int)strtol(str, NULL, 10);
     visitor_literal_int(value);
 }
 void grouping() {
