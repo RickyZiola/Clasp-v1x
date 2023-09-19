@@ -138,4 +138,16 @@
 #define ICE_REVERSE    0x52
 #define ICE_COMPLEMENT 0x53
 
+// The argument here is the amount to shift, it's limited to 6 bits.
+#define ICE_SHIFT_R    0x54
+#define ICE_SHIFT_L    0x55
+
+// The argument here is the amount to rotate, it's limited to 5 bits.
+#define ICE_ROTATE_R   0x56
+#define ICE_ROTATE_L   0x57
+
+// Empty instructions 0x58-0x5F
+
+// TODO: jumps, once those are sorted out.
+
 #endif
