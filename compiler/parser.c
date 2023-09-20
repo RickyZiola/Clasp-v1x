@@ -76,3 +76,22 @@ void binary() {
 
     visitor_op_binary(typ);
 }
+
+static bool match(TokenTyp typ) {
+  if (token_current().typ != typ) return false;
+  advance();
+  return true;
+}
+
+void compile() {
+    while (!match(TOKEN_EOF)) declaration();
+}
+
+void declaration() {
+    statement();
+}
+
+void statement() {
+
+    expression();
+}

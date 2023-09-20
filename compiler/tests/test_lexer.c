@@ -34,7 +34,7 @@
 
 void print_token(Token tok) {
     // Add %s before the '|' to print token type
-    printf(" |", DECD_TOKEN_TYP(tok.typ)+6); // strip the TOKEN_
+    printf(" %s|", DECD_TOKEN_TYP(tok.typ)+6); // strip the TOKEN_
     PRINT_BYTES(tok.str, tok.length);
     printf("| ");
 }

@@ -4,6 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+FILE *outf;
+
+void setup_compiler(const char *fname) {
+    outf = fopen(fname, "wb");
+}
+
 void visitor_literal_int(long int val) {
     // This value is NOT loaded into the data segment for faster access times.
     // In the case of string/list/obj literals, they are loaded into the data segment.
@@ -12,7 +18,7 @@ void visitor_literal_int(long int val) {
     //               ; Initial,        stack = [ ]
     // const.i <n>   ; Constnant load, stack = [n]
 
-    printf("const.i %u\n", val);
+    fprintf(outf, "const.i %u\n", val);
 }
 void visitor_op_unary(TokenTyp operator_type) {
     switch (operator_type) {
@@ -27,7 +33,7 @@ void visitor_op_unary(TokenTyp operator_type) {
 
             // This is equivalent to 0 - n, or just -n
 
-            printf("const.0\nswap\nsub.i\n");
+            fprintf(outf, "const.0\nswap\nsub.i\n");
         } break;
         case TOKEN_BANG: {
             // TODO: type checking
@@ -37,7 +43,7 @@ void visitor_op_unary(TokenTyp operator_type) {
             // not          ; Bitwise NOT, stack = [!n]
 
             // This is !n
-            printf("not\n");
+            fprintf(outf, "not\n");
         } break;
         default: {
             fprintf(stderr, "Compile error: Unknown unary operator\n");
@@ -57,7 +63,7 @@ void visitor_op_binary(TokenTyp operator_type) {
             // add.i    ; Addition, stack = [n+m]
 
             // This is n+m
-            printf("add.i\n");
+            fprintf(outf, "add.i\n");
         } break;
         case TOKEN_MINUS: {
             // TODO: type checking
@@ -67,7 +73,7 @@ void visitor_op_binary(TokenTyp operator_type) {
             // sub.i    ; Subtraction, stack = [n-m]
 
             // This is n-m
-            printf("sub.i\n");
+            fprintf(outf, "sub.i\n");
         } break;
         case TOKEN_ASTERIX: {
             // TODO: type checking
@@ -77,7 +83,7 @@ void visitor_op_binary(TokenTyp operator_type) {
             // mul.i    ; Multiplication, stack = [n*m]
 
             // This is n*m
-            printf("mul.i\n");
+            fprintf(outf, "mul.i\n");
         } break;
         case TOKEN_SLASH: {
             // TODO: type checking
@@ -87,7 +93,7 @@ void visitor_op_binary(TokenTyp operator_type) {
             // div.i    ; Division, stack = [n/m]
 
             // This is n/m
-            printf("div.i\n");
+            fprintf(outf, "div.i\n");
         } break;
         default: {
             fprintf(stderr, "Compile error: unknown binary operator\n");

@@ -36,11 +36,16 @@ typedef struct {
     OperatorPrecedence precedence;
 } ParseRule;
 
+void compile();
+
 void expression();
 void number();
 void unary();
 void binary();
 void grouping();
+
+void statement();
+void declaration();
 
 static ParseRule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},

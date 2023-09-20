@@ -5,9 +5,8 @@
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
-    load_string("32 - 28 + -5");
-    printf("\n");
-    expression();
-    printf("\n");
+    load_string(" 15 - 1 * (213 + 5) ");
+    setup_compiler("TEMP.s");
+    compile();
     return 0;
 }

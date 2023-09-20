@@ -33,7 +33,7 @@ typedef enum {
     TOKEN_NUM_LITERAL, TOKEN_STR_LITERAL,  // Literals and identifiers
     TOKEN_CHR_LITERAL, TOKEN_IDENTIFIER,
     
-    TOKEN_KEYWORD,                        // Well, keywords...
+    TOKEN_VAR,                // Keywords
 
     TOKEN_MISC               // Should (hopefully) never show up
 } TokenTyp;
@@ -73,7 +73,7 @@ typedef enum {
         case TOKEN_STR_LITERAL: out = "TOKEN_STR_LITERAL"; break; \
         case TOKEN_CHR_LITERAL: out = "TOKEN_CHR_LITERAL"; break; \
         case TOKEN_IDENTIFIER:  out = "TOKEN_IDENTIFIER";  break; \
-        case TOKEN_KEYWORD:     out = "TOKEN_KEYWORD";     break; \
+        case TOKEN_VAR:         out = "TOKEN_VAR";     break; \
         \
         case TOKEN_MISC:        out = "TOKEN_MISC";        break; \
         default:                out = "TOKEN_UNKNOWN";     \

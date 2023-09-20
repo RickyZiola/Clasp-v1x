@@ -58,12 +58,20 @@ Token lex_err(bool string, const char *errf, ...) {
     return synchronize(string);
 }
 
-bool is_whitespace(char chr) {
+bool iswhitespace(char chr) {
     return (chr == ' ') || (chr == '\t');  // TODO add all the whitespace characters
 }
 
 bool isnumeric(char chr) {
     return (chr >= '0') && (chr <= '9');
+}
+
+bool has_keyword(const char *kw) {
+    int kwLen = strlen(kw);
+    for (int kwIdx = idx; kwIdx < idx + kwLen - 1; kwIdx++) {
+        if (kwIdx >= strlen(str)) return false;
+        if (kw[kwIdx - idx] != str[kwIdx - 1]) return false;
+    } return true;
 }
 
 Token _parse_token() {  // TODO
@@ -72,9 +80,10 @@ Token _parse_token() {  // TODO
         if (idx > strlen(str)) return (Token) { NULL, 0, fd, lineno, TOKEN_EOF };
 
             // Keywords
-            // 'var', 'let', 'const', 'while', 'if', 'fn',
-            //                                       'for'
+            // 'let', 'const', 'while', 'if', 'fn',
+            //                                'for'
             // TODO
+        if (has_keyword("var")) { idx += 3; return (Token) { "var", 3, fd, lineno, TOKEN_VAR }; }
 
         // Identifiers
         if (next == '_' || (next >= 'a' && next <= 'z') || (next > 'A' && next < 'Z')) {
@@ -269,7 +278,7 @@ Token _parse_token() {  // TODO
             } break;
 
             default: {
-                if (is_whitespace(next)) continue;
+                if (iswhitespace(next)) continue;
                 return lex_err(false, "Unexpected character \'%c\' matches no lexical rule", next);
             }
         };
