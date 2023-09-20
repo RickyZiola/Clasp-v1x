@@ -4,8 +4,16 @@
 // Index of the lexer into the input string
 static unsigned int idx = 0;
 
-static Token  current;
+static Token current;
 static Token prev;
+
+static DynamicBuffer(char *) *filenames;
+static int openFiles = 0;
+static char *currentFile;
+
+char *get_current_file() {
+    return currentFile;
+}
 
 // The file descriptor of the current file being lexed
 short fd;
@@ -49,8 +57,7 @@ Token lex_err(bool string, const char *errf, ...) {
     va_list args;
     va_start(args, errf);
 
-    //fprintf(stderr, "Lexical error at line %d of file \"%s\": \"", lineno, readDynamicBuf(char *, loaded_files, fd)); // TODO: sort out the loaded_files buffer
-    fprintf(stderr, "Lexical error at line %d of file TODO: \"", lineno);
+    fprintf(stderr, "Lexical error at line %d of file \"%s\": \"", lineno, currentFile);
     vfprintf(stderr, errf, args);
     fprintf(stderr, "\"\n");
     hadErr = true;
@@ -59,7 +66,7 @@ Token lex_err(bool string, const char *errf, ...) {
 }
 
 bool iswhitespace(char chr) {
-    return (chr == ' ') || (chr == '\t');  // TODO add all the whitespace characters
+    return (chr == ' ') || (chr == '\t') || (chr == '\r') || (chr == '\n');  // TODO add all the whitespace characters
 }
 
 bool isnumeric(char chr) {
@@ -74,10 +81,34 @@ bool has_keyword(const char *kw) {
     } return true;
 }
 
+static void _new_file() {
+    DynamicBuffer(char) *file = newDynamicBuf(char);
+    initDynamicBuf(char, file);
+    char current;
+    int idx = 0;
+    while (!iswhitespace(current = char_next())) {
+        writeDynamicBuf(char, file, idx, current);
+        ++idx;
+    }
+    currentFile = malloc(idx);
+    strncpy(currentFile, file->data, idx);
+    currentFile[idx + 1] = '\0';
+
+    writeDynamicBuf(char *, filenames, openFiles, currentFile); ++openFiles;
+}
+
 Token _parse_token() {  // TODO
     while(1) {
         char next = char_next();
+
         if (idx > strlen(str)) return (Token) { NULL, 0, fd, lineno, TOKEN_EOF };
+
+        if (next == '#') {  // Lexer directives
+            if (char_next() == 'f') {  // File directive, indicates the start of a new file
+                _new_file();
+            }
+            next = char_next();
+        }
 
             // Keywords
             // 'let', 'const', 'while', 'if', 'fn',
@@ -302,6 +333,9 @@ char char_peek() {
 }
 
 void load_string(char *string) {
+    filenames = newDynamicBuf(char *);
+    initDynamicBuf(char *, filenames);
+
     str = string;
     current = _parse_token();
 }

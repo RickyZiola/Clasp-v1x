@@ -79,7 +79,6 @@ typedef enum {
         default:                out = "TOKEN_UNKNOWN";     \
     }; out; })
 
-
 // Struct to represnt a token / lexeme
 typedef struct {
     char *str;     // THIS IS NOT AN NTS/ZTS! This is a pointer acting with length below as a string.
@@ -114,6 +113,7 @@ static Token synchronize(bool string);
 
 // Parse the next token from the input string
 static Token _parse_token();
+char *get_current_file();
 
 static char char_next();
 static char char_current();

@@ -9,6 +9,9 @@ FILE *outf;
 void setup_compiler(const char *fname) {
     outf = fopen(fname, "wb");
 }
+void teardown_compiler() {
+    fclose(outf);
+}
 
 void visitor_literal_int(long int val) {
     // This value is NOT loaded into the data segment for faster access times.

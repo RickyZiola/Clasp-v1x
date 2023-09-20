@@ -6,7 +6,7 @@ void parse_err(Token tok, const char *errf, ...) {
     va_list args;
     va_start(args, errf);
 
-    fprintf(stderr, "Parse error at %d of file TODO: \"", tok.line);
+    fprintf(stderr, "Parse error at line %d of file %s: \"", tok.line, get_current_file());
     vfprintf(stderr, errf, args);
     fprintf(stderr, "\"\n");
     parser_synchronize();

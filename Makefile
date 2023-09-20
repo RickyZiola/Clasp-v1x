@@ -10,6 +10,8 @@ DEPS = $(shell cd $(LIB_DIR) && find .. -type f -name "*.c" ! -name ".*" $(forea
 
 default:
 	@echo "Make target 'test' or 'build'"
+	@echo "Current line count:"
+	@find ./** -type f \( -name "*.c" -o -name "*.h" \) -exec cat {} \; | wc -l
 
 LIBS=$(shell cd $(LIB_DIR) && find  . -type f -name "*.o")
 LIB_ARGS=-L$(LIB_DIR) $(foreach lib,$(LIBS), -l:$(notdir $(lib)))
