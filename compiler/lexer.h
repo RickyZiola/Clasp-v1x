@@ -14,7 +14,7 @@
 
 // Enum to represent types of tokens
 typedef enum {
-    TOKEN_EOF, TOKEN_NEWLINE,      // Special delimeter tokens
+    TOKEN_EOF,      // Special delimeter tokens
 
     TOKEN_SEMICOLON, TOKEN_LEFT_PAREN,    // Punctuation, TODO
     TOKEN_RIGHT_PAREN, TOKEN_LEFT_CURLY,
@@ -44,7 +44,6 @@ typedef enum {
     char *out;                                                  \
     switch (typ) {                                              \
         case TOKEN_EOF:         out = "TOKEN_EOF";         break; \
-        case TOKEN_NEWLINE:     out = "TOKEN_NEWLINE";     break; \
         case TOKEN_SEMICOLON:   out = "TOKEN_SEMICOLON";   break; \
         case TOKEN_LEFT_PAREN:  out = "TOKEN_LEFT_PAREN";  break; \
         case TOKEN_RIGHT_PAREN: out = "TOKEN_RIGHT_PAREN"; break; \

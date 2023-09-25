@@ -146,17 +146,6 @@ Token _parse_token() {  // TODO
         }
         switch (next) {
 
-            // Newlines
-            case '\r': {
-                if (char_next() != '\n') return lex_err(false, "Unexpected character \\r without following \\n");
-                ++lineno;
-                return (Token) { "\r\n", 2, fd, lineno, TOKEN_NEWLINE };
-            } break;
-            case '\n': {
-                ++lineno;
-                return (Token) {   "\n", 1, fd, lineno, TOKEN_NEWLINE };
-            } break;
-
             // Punctuation
             case ';': {
                 return (Token) { ";", 1, fd, lineno, TOKEN_SEMICOLON };
