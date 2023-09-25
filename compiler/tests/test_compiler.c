@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
-    load_string("#fNOFILE.csp 15 - 1 * (213 + 5) ");
+    load_string("#fNOFILE.csp var test: int ");
     setup_compiler("TEMP.s");
     compile();
     teardown_compiler();

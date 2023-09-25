@@ -2,10 +2,13 @@
 #define VISITOR_H
 
 #include "lexer.h"
+#include "parser.h"
 
-void visitor_literal_int(long int val);
+void visitor_num_literal(void *val, Type *typ);
 
 void  visitor_op_unary(TokenTyp operator_type);
 void visitor_op_binary(TokenTyp operator_type);
+
+void visitor_var_decl(Token name, Type *typ);
 
 #endif

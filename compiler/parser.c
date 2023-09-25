@@ -56,9 +56,15 @@ void number() {
     char *str = malloc(num.length + 1);
     memcpy(str, num.str, num.length);
     str[num.length] = '\0';
-    if (strchr(str, '.') !=  NULL) parse_err(num, "Floating-points are not yet supported");
-    long int value = (long int)strtol(str, NULL, 10);
-    visitor_literal_int(value);
+    if (strchr(str, '.') ==  NULL) {
+        int value = (int)strtol(str, NULL, 10);
+        Type typ = { TYPE_FINAL, "int" };
+        visitor_num_literal(&value, &typ);
+    } else {
+        float value = (float)strtof(str, NULL);
+        Type typ = { TYPE_FINAL, "float" };
+        visitor_num_literal(&value, &typ);
+    }
 }
 void grouping() {
     expression();
@@ -91,7 +97,45 @@ void declaration() {
     statement();
 }
 
-void statement() {
+static Type *parse_type() {  // TODO: enclosing types (lists, lambdas, etc.)
+    Token typename = token_next();
+    if (typename.typ != TOKEN_IDENTIFIER) { parse_err(typename, "Expected typename"); return NULL; }
+    Type ret = { .typ = TYPE_FINAL, .final = typename.str };
+    Type *out = malloc(sizeof(Type));
 
+    memcpy(out, &ret, sizeof(Type));
+
+    return out;
+}
+
+void variable_decl() {
+    // 'var' 'name' ':' 'type' ('=' <initializer>)? ';'  \
+              ^
+    
+    Token name = token_next();
+    if (name.typ != TOKEN_IDENTIFIER) parse_err(name, "Expected identifier after 'var' keyword");
+
+    // 'var' 'name' ':' 'type' ('=' <initializer>)? ';'  \
+                     ^
+    if (!match(TOKEN_COLON)) parse_err(token_current(), "Expected ':' after variable name");
+
+    // 'var' 'name' ':' 'type' ('=' <initializer>)? ';'  \
+                         ^
+    Type *typ = parse_type();
+
+    // 'var' 'name' ':' 'type' ('=' <initializer>)? ';'  \
+                                 ^?                  ^?
+
+    if (match(TOKEN_EQ)) {  // We have an initializer,
+        expression();       // compile it.
+    } else {                // No initializer,
+        int null=0;         // output a 0.
+        Type typ = { TYPE_FINAL, "int" };
+        visitor_num_literal(&null, &typ);
+    }
+ }
+
+void statement() {
+    if (match(TOKEN_VAR)) return variable_decl();
     expression();
 }

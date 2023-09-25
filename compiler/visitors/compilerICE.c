@@ -1,6 +1,7 @@
 #include "../visitor.h"
 #include "compiler.h"
 #include "ICE.h"
+#include "../parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,7 +14,7 @@ void teardown_compiler() {
     fclose(outf);
 }
 
-void visitor_literal_int(long int val) {
+void visitor_num_literal(void *val, Type *type) {
     // This value is NOT loaded into the data segment for faster access times.
     // In the case of string/list/obj literals, they are loaded into the data segment.
 
@@ -21,7 +22,15 @@ void visitor_literal_int(long int val) {
     //               ; Initial,        stack = [ ]
     // const.i <n>   ; Constnant load, stack = [n]
 
-    fprintf(outf, "const.i %u\n", val);
+    if (strncmp(type->final, "int", 3))
+        fprintf(outf, "const.i %d\n", *((int *)  val));  // Integers
+    else if (strncmp(type->final, "float", 5))
+        fprintf(outf, "const.r %f\n", *((float *)val));  // Real numbers (floats)
+    else {
+        fprintf(stderr, "Compile error: Unknown numeric type \"%s\"", type->final);
+        exit(-1);
+    }
+        
 }
 void visitor_op_unary(TokenTyp operator_type) {
     switch (operator_type) {
@@ -103,4 +112,8 @@ void visitor_op_binary(TokenTyp operator_type) {
             exit(-1);
         }
     }
+}
+
+void visitor_var_decl(Token name, Type *typ) {
+    // Assume the initializer is already on the stack
 }

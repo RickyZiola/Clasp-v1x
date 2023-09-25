@@ -1,6 +1,20 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+typedef enum TypeTyp {
+  TYPE_FINAL,
+  TYPE_ENCLOSING,
+} TypeTyp;
+typedef struct Type Type;
+typedef struct Type {  // TODO: generics (how tf do i work that in?)
+  TypeTyp typ;
+
+  union {
+    char *final;
+    Type *enclosed;
+  };
+} Type;
+
 #include "lexer.h"
 
 #include <stdarg.h>
@@ -30,10 +44,10 @@ typedef enum {
 typedef void (*ParseFn)();
 
 typedef struct {
-    ParseFn prefix;
-    ParseFn infix;
+  ParseFn prefix;
+  ParseFn infix;
 
-    OperatorPrecedence precedence;
+  OperatorPrecedence precedence;
 } ParseRule;
 
 void compile();
@@ -43,6 +57,7 @@ void number();
 void unary();
 void binary();
 void grouping();
+void variable_decl();
 
 void statement();
 void declaration();
