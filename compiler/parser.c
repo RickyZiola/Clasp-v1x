@@ -52,7 +52,7 @@ void expression() {
 }
 
 void number() {
-    Token num = token_previous(); // TODO: floating-points
+    Token num = token_previous();
     char *str = malloc(num.length + 1);
     memcpy(str, num.str, num.length);
     str[num.length] = '\0';
@@ -66,6 +66,12 @@ void number() {
         visitor_num_literal(&value, &typ);
     }
 }
+
+void variable() {
+    Token name = token_previous();  // TODO: function calls
+    visitor_var_read(name);
+}
+
 void grouping() {
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expected ')' after expression");
@@ -133,6 +139,10 @@ void variable_decl() {
         Type typ = { TYPE_FINAL, "int" };
         visitor_num_literal(&null, &typ);
     }
+
+    visitor_var_decl(name, typ);
+
+    if (!match(TOKEN_SEMICOLON)) parse_err(token_current(), "Expected ';' after variable declaration");
  }
 
 void statement() {

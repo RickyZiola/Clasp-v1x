@@ -4,14 +4,20 @@
 #include "../parser.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../../common/hash_table.h"
 
-FILE *outf;
+static FILE *outf;
+static HashTable *variable_ht;
+
+static int num_globals = 0;
 
 void setup_compiler(const char *fname) {
     outf = fopen(fname, "wb");
+    variable_ht = createHashTable();
 }
 void teardown_compiler() {
     fclose(outf);
+    freeHashTable(variable_ht);
 }
 
 void visitor_num_literal(void *val, Type *type) {
@@ -22,9 +28,9 @@ void visitor_num_literal(void *val, Type *type) {
     //               ; Initial,        stack = [ ]
     // const.i <n>   ; Constnant load, stack = [n]
 
-    if (strncmp(type->final, "int", 3))
+    if (strncmp(type->final, "int", 3) == 0)
         fprintf(outf, "const.i %d\n", *((int *)  val));  // Integers
-    else if (strncmp(type->final, "float", 5))
+    else if (strncmp(type->final, "float", 5) == 0)
         fprintf(outf, "const.r %f\n", *((float *)val));  // Real numbers (floats)
     else {
         fprintf(stderr, "Compile error: Unknown numeric type \"%s\"", type->final);
@@ -116,4 +122,18 @@ void visitor_op_binary(TokenTyp operator_type) {
 
 void visitor_var_decl(Token name, Type *typ) {
     // Assume the initializer is already on the stack
+    char *name_str = malloc(name.length+1);
+    memcpy(name_str, name.str, name.length);
+    name_str[name.length] = '\0';
+    insert(variable_ht, name_str, num_globals);
+
+    fprintf(outf, "global.w %u\n", num_globals++);
+}
+void visitor_var_read(Token name) {
+    char *name_str = malloc(name.length+1);
+    memcpy(name_str, name.str, name.length);
+    name_str[name.length] = '\0';
+
+    int idx = get(variable_ht, name_str);
+    fprintf(outf, "global.r %u\n", idx);
 }

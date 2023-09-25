@@ -54,6 +54,7 @@ void compile();
 
 void expression();
 void number();
+void variable();
 void unary();
 void binary();
 void grouping();
@@ -82,7 +83,7 @@ static ParseRule rules[] = {
   [TOKEN_GREATER_EQ]    = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LESS]          = {NULL,     NULL,   PREC_NONE},
   [TOKEN_LESS_EQ]       = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_IDENTIFIER]    = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_IDENTIFIER]    = {variable, NULL,   PREC_NONE},
   [TOKEN_STR_LITERAL]   = {NULL,     NULL,   PREC_NONE},
   [TOKEN_NUM_LITERAL]   = {number,   NULL,   PREC_NONE},
   // [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},

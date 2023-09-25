@@ -49,7 +49,7 @@ void print_tokens() {
 }
 
 int main(int argc, char *argv[]) {
-    load_string("var test: int = 12.34;\r\nprint(\"wow\");\ntest = 21;");
+    load_string(" var test: int = wowow; ");
     print_tokens();
 
     return 0;
