@@ -11,30 +11,30 @@ static HashTable *variable_ht;
 
 static int num_globals = 0;
 
-void setup_compiler(const char *fname) {
+void setup_compiler(const char *fname) {  // Open the file and setup our hash table
     outf = fopen(fname, "wb");
     variable_ht = createHashTable();
+
+    fprintf(outf, "#include \"ICE.s\"\n");
 }
-void teardown_compiler() {
+void teardown_compiler() {                // Free resources 
     fclose(outf);
     freeHashTable(variable_ht);
 }
 
 void visitor_num_literal(void *val, Type *type) {
-    // This value is NOT loaded into the data segment for faster access times.
-    // In the case of string/list/obj literals, they are loaded into the data segment.
-
     // ICE assembly for loading a constant onto the stack:
     //               ; Initial,        stack = [ ]
     // const.i <n>   ; Constnant load, stack = [n]
 
-    if (strncmp(type->final, "int", 3) == 0)
+    if (strncmp(type->final, "int", 3) == 0)             // Not the best way to do this, but works with user-defined types
         fprintf(outf, "const.i %d\n", *((int *)  val));  // Integers
-    else if (strncmp(type->final, "float", 5) == 0)
+    else if (strncmp(type->final, "float", 5) == 0) {
+        printf("Compiler warning: floats are not yet supported, be careful.\n");
         fprintf(outf, "const.r %f\n", *((float *)val));  // Real numbers (floats)
-    else {
+    } else {
         fprintf(stderr, "Compile error: Unknown numeric type \"%s\"", type->final);
-        exit(-1);
+        exit(-1);  // how would this even happen lmao
     }
         
 }
@@ -122,18 +122,25 @@ void visitor_op_binary(TokenTyp operator_type) {
 
 void visitor_var_decl(Token name, Type *typ) {
     // Assume the initializer is already on the stack
+
     char *name_str = malloc(name.length+1);
     memcpy(name_str, name.str, name.length);
-    name_str[name.length] = '\0';
-    insert(variable_ht, name_str, num_globals);
+    name_str[name.length] = '\0'; // Convert the name to a null-terminated string
 
-    fprintf(outf, "global.w %u\n", num_globals++);
+    insert(variable_ht, name_str, num_globals); // Insert the variable into the hash table
+
+    fprintf(outf, "global.w %u\n", num_globals++); // Write the initializer (already on the stack) to the variable
 }
 void visitor_var_read(Token name) {
     char *name_str = malloc(name.length+1);
     memcpy(name_str, name.str, name.length);
-    name_str[name.length] = '\0';
+    name_str[name.length] = '\0'; // Convert the name to a null-terminated string
 
-    int idx = get(variable_ht, name_str);
-    fprintf(outf, "global.r %u\n", idx);
+    int idx = get(variable_ht, name_str);  // Read the variable from the hash table
+    if (idx == -1) {  // hash lookup failed
+        fprintf(stderr, "Compile error: undefined variable \"%s\"\n", name_str);
+        exit(-1);
+    }
+
+    fprintf(outf, "global.r %u\n", idx); // Read the variable onto the class
 }

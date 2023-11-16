@@ -78,7 +78,9 @@ bool has_keyword(const char *kw) {
     for (int kwIdx = idx; kwIdx < idx + kwLen - 1; kwIdx++) {
         if (kwIdx >= strlen(str)) return false;
         if (kw[kwIdx - idx] != str[kwIdx - 1]) return false;
-    } return true;
+    }
+    if (!iswhitespace(str[idx + kwLen - 1])) return false;
+    return true;
 }
 
 static void _new_file() {

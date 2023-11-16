@@ -49,7 +49,7 @@ void print_tokens() {
 }
 
 int main(int argc, char *argv[]) {
-    load_string(" var test: int = wowow; ");
+    load_string("#fNOFILE.csp var test: int = 121 + 232;\nvar variables: int = 1 + test; ");
     print_tokens();
 
     return 0;
